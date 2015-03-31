@@ -9,8 +9,8 @@ var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAni
 var game = {
     //Game setup
     init: function() {
-        c.width = 600;
-        c.height = 600;
+        c.width = 550;
+        c.height = 550;
         drawIntro();
     },
 
@@ -34,7 +34,10 @@ var game = {
         red_y_3: 0,
         orange_y_1: -114,
         orange_y_2: -114,
-        cube_anim_complete: false
+        cube_anim_complete: false,
+        anim_complete: false,
+        alpha: 1,
+        delta: 0.1
     }
 }
 
@@ -42,7 +45,7 @@ function drawIntro() {
     ctx.clearRect(0, 0, 500, 500);
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, 500, 500);
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
     ctx.font = "40px Pixel";
 
     ctx.drawImage(game.images.cube_red, 121, game.images.red_y_1);
@@ -67,9 +70,14 @@ function drawIntro() {
 
     if (game.images.cube_anim_complete == true) {
         ctx.fillText("B L O B B L E  G A M E S", 0, 550)
+
+        setTimeout(function () {
+            game.images.anim_complete = true;
+            drawMenu();
+        }, 2000)
     }
 
-    requestAnimationFrame(drawIntro);
+    if (!game.images.anim_complete) requestAnimationFrame(drawIntro);
 }
 
 function drawMenu() {
