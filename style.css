@@ -1,0 +1,21 @@
+@font-face {
+    font-family: Pixel;
+    src: url("fonts/04B_03_.TTF");
+}
+
+body {
+    background-color: #000000;
+}
+
+#game {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+#secret {
+    font-family: Pixel;
+    font-size: 5px;
+}
