@@ -21,6 +21,7 @@ var game = {
         game.images.cube_orange.src = "images/cube-orange.png";
         game.images.title.src = "images/title.png";
         game.images.menu_arrow.src = "images/menu-arrow.png";
+        game.images.lock.src = "images/lock.png";
 
         game.init();
     },
@@ -30,7 +31,8 @@ var game = {
         cube_red: new Image(),
         cube_orange: new Image(),
         title: new Image(),
-        menu_arrow: new Image()
+        menu_arrow: new Image(),
+        lock: new Image()
     },
 
     audio: {
@@ -40,8 +42,10 @@ var game = {
                 game.audio.last = id;
             }
         },
-
-        last: ""
+        last: "",
+        clear: function () {
+            game.audio.last = "";
+        }
     },
 
     stage: "intro"
@@ -68,9 +72,10 @@ var menu = {
 
 var levelSelect = {
     draw: false,
-    levels: ["LEVEL 1", "LEVEL 2", "LEVEL 3", "LEVEL 4", "LEVEL 5"],
+    levels: ["LEVEL 1", "LEVEL 2", "LEVEL 3", "LEVEL 4", "BACK"],
     selectedLevel: 0,
-    y: [140, 240, 340, 440, 540]
+    y: [140, 240, 340, 440, 540],
+    lockedLevels: [1, 2, 3]
 }
 
 function drawIntro() {
@@ -115,7 +120,6 @@ function drawIntro() {
             anim.anim_complete = true;
             anim.draw = false;
             menu.draw = true;
-            game.stage = "menu"
             drawMenu();
         }, 2500);
     }
@@ -128,6 +132,8 @@ function drawMenu() {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, 550, 550);
     ctx.font = "70px Pixel";
+
+    game.stage = "menu";
 
     ctx.drawImage(game.images.title, 121, menu.title_y);
     if (menu.title_y < 25) menu.title_y += 0.2;
@@ -158,30 +164,78 @@ function draw_levelSelect() {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, 550, 550);
 
+    game.stage = "levelSelect";
+
     for (x=0; x<levelSelect.levels.length; x++) {
-        if (x == levelSelect.selectedLevel) ctx.fillStyle = "#d04648";
+        if (x == levelSelect.selectedLevel) { 
+            if (levelSelect.lockedLevels.indexOf(x) > -1) ctx.fillStyle = "#a15d54";
+            else ctx.fillStyle = "#d04648";
+        }
         else ctx.fillStyle = "#ff9385";
+        
+        if (levelSelect.lockedLevels.indexOf(x) > -1) ctx.fillStyle = "#a15d54";
+        else if (x != levelSelect.selectedLevel) ctx.fillStyle = "#ff9385";
 
         ctx.fillText(levelSelect.levels[x], 168, levelSelect.y[x]);
+
+        if (levelSelect.lockedLevels.indexOf(x) > -1) ctx.drawImage(game.images.lock, 475, levelSelect.y[x] - 50);
     }
 
-    if (levelSelect.selectedLevel == 0) ctx.drawImage(game.images.menu_arrow, 85, 195);
+    if (levelSelect.selectedLevel == 0) ctx.drawImage(game.images.menu_arrow, 85, 95);
+    else if (levelSelect.selectedLevel == 1) ctx.drawImage(game.images.menu_arrow, 85, 195);
+    else if (levelSelect.selectedLevel == 2) ctx.drawImage(game.images.menu_arrow, 85, 295);
+    else if (levelSelect.selectedLevel == 3) ctx.drawImage(game.images.menu_arrow, 85, 395);
+    else if (levelSelect.selectedLevel == 4) ctx.drawImage(game.images.menu_arrow, 85, 495);
 
     if (levelSelect.draw) requestAnimationFrame(draw_levelSelect);
 }
 
 document.addEventListener("keydown", function (e) {
     if (game.stage == "menu") {
-        if (e.keyCode == 40 && menu.selectedOption == "play") menu.selectedOption = "options";
-        else if (e.keyCode == 38 && menu.selectedOption == "options") menu.selectedOption = "play";  
+        if (e.keyCode == 40 && menu.selectedOption == "play") {
+            menu.selectedOption = "options";
+            game.audio.playOnce("menu-select");
+            game.audio.clear();
+        }
+        else if (e.keyCode == 38 && menu.selectedOption == "options"){ 
+            menu.selectedOption = "play";  
+            game.audio.playOnce("menu-select");
+            game.audio.clear();
+        }
         
         else if (e.keyCode == 13 && menu.selectedOption == "play") {
+            game.audio.playOnce("menu-enter");
             menu.draw = false;
             levelSelect.draw = true;
+            levelSelect.selectedLevel = 0;
             draw_levelSelect();
         }
         else if (e.keyCode == 13 && menu.selectedOption == "options") {
+            game.audio.playOnce("menu-enter");
             menu.draw = false;
+        }
+    }
+    else if (game.stage == "levelSelect") {
+        if (e.keyCode == 40) {
+            if (levelSelect.selectedLevel < 4) {
+                levelSelect.selectedLevel++
+                game.audio.playOnce("menu-select");
+                game.audio.clear();
+            }
+        }
+        else if (e.keyCode == 38){ 
+            if (levelSelect.selectedLevel > 0) { 
+                levelSelect.selectedLevel--
+                game.audio.playOnce("menu-select");
+                game.audio.clear();
+            }
+        }
+        else if (e.keyCode == 13 && levelSelect.selectedLevel == 4) {
+            game.audio.playOnce("menu-enter");
+            game.audio.clear();
+            levelSelect.draw = false;
+            menu.draw = true;
+            drawMenu();
         }
     }
 });
