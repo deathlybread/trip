@@ -28,6 +28,7 @@ var game = {
         cube_red: new Image(),
         cube_orange: new Image(),
         title: new Image(),
+        title_y: -200,
         green_y: -114,
         red_y_1: 0,
         red_y_2: 0,
@@ -36,16 +37,26 @@ var game = {
         orange_y_2: -114,
         cube_anim_complete: false,
         anim_complete: false,
-        alpha: 1,
-        delta: 0.1
+        showText: false,
+        alpha: 0,
+        delta: 0.01
+    },
+
+    audio: {
+        playOnce: function(id) {
+            if (game.audio.last != id) {
+                document.getElementById(id).play();
+                game.audio.last = id;
+            }
+        }
     }
 }
 
 function drawIntro() {
-    ctx.clearRect(0, 0, 500, 500);
+    ctx.clearRect(0, 0, 550, 550);
     ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, 500, 500);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.fillRect(0, 0, 550, 550);
+    ctx.fillStyle = "#FFFFFF";
     ctx.font = "40px Pixel";
 
     ctx.drawImage(game.images.cube_red, 121, game.images.red_y_1);
@@ -69,24 +80,32 @@ function drawIntro() {
     if (game.images.green_y > 185) game.images.cube_anim_complete = true;
 
     if (game.images.cube_anim_complete == true) {
-        ctx.fillText("B L O B B L E  G A M E S", 0, 550)
+        if (game.images.showText) {
+            ctx.fillText("B L O B B L E  G A M E S", 0, 550);
+        }
+
+        setTimeout(function () {
+            game.images.showText = true;
+            game.audio.playOnce("intro");
+        }, 500);
 
         setTimeout(function () {
             game.images.anim_complete = true;
             drawMenu();
-        }, 2000)
+        }, 2500);
     }
 
     if (!game.images.anim_complete) requestAnimationFrame(drawIntro);
 }
 
 function drawMenu() {
-    ctx.clearRect(0, 0, 500, 500);
+    ctx.clearRect(0, 0, 550, 550);
     ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, 500, 500);
+    ctx.fillRect(0, 0, 550, 550);
 
-    ctx.drawImage(game.images.title, 121, 25);
-    
+    ctx.drawImage(game.images.title, 121, game.images.title_y);
+    if (game.images.title_y < 25) game.images.title_y += 0.2;
+
     requestAnimationFrame(drawMenu);
 }
 
