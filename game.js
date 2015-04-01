@@ -39,7 +39,9 @@ var game = {
                 document.getElementById(id).play();
                 game.audio.last = id;
             }
-        }
+        },
+
+        last: ""
     },
 
     stage: "intro"
@@ -65,7 +67,10 @@ var menu = {
 }
 
 var levelSelect = {
-    draw: false
+    draw: false,
+    levels: ["LEVEL 1", "LEVEL 2", "LEVEL 3", "LEVEL 4", "LEVEL 5"],
+    selectedLevel: 0,
+    y: [140, 240, 340, 440, 540]
 }
 
 function drawIntro() {
@@ -152,6 +157,15 @@ function draw_levelSelect() {
     ctx.clearRect(0, 0, 550, 550);
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, 550, 550);
+
+    for (x=0; x<levelSelect.levels.length; x++) {
+        if (x == levelSelect.selectedLevel) ctx.fillStyle = "#d04648";
+        else ctx.fillStyle = "#ff9385";
+
+        ctx.fillText(levelSelect.levels[x], 168, levelSelect.y[x]);
+    }
+
+    if (levelSelect.selectedLevel == 0) ctx.drawImage(game.images.menu_arrow, 85, 195);
 
     if (levelSelect.draw) requestAnimationFrame(draw_levelSelect);
 }
