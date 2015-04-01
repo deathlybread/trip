@@ -13,6 +13,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     display: block;
+    cursor: url(images/cursor.cur);
 }
 
 #secret {
